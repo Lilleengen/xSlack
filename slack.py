@@ -1,7 +1,8 @@
 import time
 from slackclient import SlackClient
+import config
 
-token = 'xoxp-'  # found at https://api.slack.com/web#authentication
+token = config.key
 members = dict()
 
 sc = SlackClient(token)
