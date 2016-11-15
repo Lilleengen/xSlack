@@ -10,9 +10,17 @@ def run(token):
     ts_dict = dict()
     channels = dict()
     clients = list()
+    clients_users = dict()
+
     for token_other in config.tokens:
         if token_other != token:
             clients.append(SlackClient(token_other))
+
+    for client in clients:
+        clients_users[client.token] = dict()
+        for user in client.api_call("users.list")["members"]:
+            clients_users[client.token][user["name"]] = user["id"]
+
     sc = SlackClient(token)
 
     if sc.rtm_connect():  # connect to a Slack RTM websocket
@@ -43,7 +51,9 @@ def run(token):
                             sc.api_call("chat.update", token=token_other, ts=ts_dict[action["message"]["ts"]], channel=action["channel"], text=text)
                 elif "channel" in action and action["channel"] in channels and channels[action["channel"]] in config.channels and "type" in action and action["type"] == "message" and "text" in action and action["text"] != last_text and "user" in action:
                     last_text=action["text"]
-                    text = re.sub(r"<@U(?:\d|\w){8}>", lambda m: "@" + members[m.group(0)[2:-1]]["name"], action["text"])
+                    text = re.sub(r"(?:^| |\n)@(?:\d|[a-z]){1,23}(?:$| |\n)", lambda m: re.sub(r"@(?:\d|[a-z]){1,23}", lambda m2: "<-----@" + clients_users[client.token][m2.group(0)[1:]] + ">", m.group(0)), action["text"])
+                    text = re.sub(r"<@U(?:\d|\w){8}>", lambda m: "@" + members[m.group(0)[2:-1]]["name"], text)
+                    text = re.sub(r"<-----@", "<@", text)
                     for client in clients:
                         ts_dict[action["ts"]] = client.api_call("chat.postMessage", channel=channels[action["channel"]], text=text, username=members[action["user"]]["name"] + " @ " + team_name, icon_url=members[action["user"]]["image"])["ts"]
             time.sleep(0.1)
