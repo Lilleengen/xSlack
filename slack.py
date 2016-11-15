@@ -2,8 +2,10 @@ import time
 from slackclient import SlackClient
 import config
 import re
+import threading
 
-for token in config.tokens:
+
+def run(token):
     members = dict()
     ts_dict = dict()
     channels = dict()
@@ -47,3 +49,7 @@ for token in config.tokens:
             time.sleep(0.1)
     else:
         print('Connection Failed, invalid token?')
+
+for token in config.tokens:
+    t = threading.Thread(target=run, args=(token,))
+    t.start()
