@@ -1,6 +1,8 @@
-tokens = [
-    "xoxp-",
-    "xoxp-"
+channels = [{
+    "name": "channel_name",
+    "tokens": [
+            "xoxp-token",
+            "xoxp-token"
+        ]
+    }
 ]
-
-channels = ["channel1", "channel2"]
