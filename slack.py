@@ -60,6 +60,16 @@ def run(token, other_tokens, channel_names):
                             text = re.sub(r"(?:^| |\n)@(?:\d|[a-z]){1,23}(?:$| |\n)", lambda m: re.sub(r"@(?:\d|[a-z]){1,23}", lambda m2: m2.group(0) if m2.group(0)[1:] not in clients_users[client.token] else "<@" + clients_users[client.token][m2.group(0)[1:]] + ">", m.group(0)), text)
                             text = re.sub(r"-----@-----", "@", text)
                             print(client.api_call("chat.update", ts=ts_dict[client.token][action["message"]["ts"]], channel=clients_channels[channels[action["channel"]]], text=text))
+                elif "channel" in action and action["channel"] in channels and channels[action["channel"]] in channel_names and action["type"] == "message" and "subtype" in action and action["subtype"] == "group_leave":
+                    response = client.api_call("chat.postMessage",
+                                               channel=clients_channels[channels[action["channel"]]], text="@" + members[action["user"]]["name"] + " was removed from the chat in " + team_name,
+                                               username="xSlack",
+                                               icon_emoji=":heavy_minus_sign:")
+                elif "channel" in action and action["channel"] in channels and channels[action["channel"]] in channel_names and action["type"] == "message" and "subtype" in action and action["subtype"] == "group_join":
+                    response = client.api_call("chat.postMessage",
+                                               channel=clients_channels[channels[action["channel"]]], text="@" + members[action["user"]]["name"] + " was added to the chat in " + team_name,
+                                               username="xSlack",
+                                               icon_emoji=":heavy_plus_sign:")
                 elif "ts" in action and "channel" in action and action["channel"] in channels and channels[action["channel"]] in channel_names and "type" in action and action["type"] == "message" and "text" in action and "user" in action:
                     text = re.sub(r"<@U(?:\d|\w){8}>", lambda m: "-----@-----" + members[m.group(0)[2:-1]]["name"], action["text"])
                     text = re.sub(r"<@U(?:\d|\w){8}\|(?:\d|[a-z]){1,23}>", lambda m: "-----@-----" + m.group(0)[12:-1], text)
