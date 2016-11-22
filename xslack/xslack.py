@@ -99,9 +99,13 @@ def run(token, other_tokens, channel_names):
                                 get["username"] = members[action["user"]]["name"] + " @ " + team_name
                                 get["icon_url"] = members[action["user"]]["image"]
                                 if "initial_comment" in action["file"] and "comment" in action["file"]["initial_comment"]:
-                                    get["initial_comment"] = action["file"]["initial_comment"]["comment"]
+                                    get["initial_comment"] = "File uploaded by @" + members[action["user"]]["name"] + " in " +  team_name + "\n\n" + action["file"]["initial_comment"]["comment"]
+                                else:
+                                    get["initial_comment"] = "File uploaded by @" + members[action["user"]]["name"] + " in " + team_name
 
-                                file_info["child_ids"][client.token] = json.loads(requests.post('https://slack.com/api/files.upload?' + urllib.parse.urlencode(get), files=files).text)["file"]["id"]
+                                upload_response = json.loads(requests.post('https://slack.com/api/files.upload?' + urllib.parse.urlencode(get), files=files).text)
+                                file_info["child_ids"][client.token] = upload_response["file"]["id"]
+
                             shared_files[sc.token].append(file_info)
                             c.release()
                         else:
