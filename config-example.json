@@ -1,0 +1,11 @@
+{
+   "channels":[
+      {
+         "name":"example",
+         "tokens":[
+            "xoxb-example",
+            "xoxb-example"
+         ]
+      }
+   ]
+}

@@ -4,7 +4,6 @@ import urllib
 
 import requests
 from slackclient import SlackClient
-import config
 import re
 import threading
 
@@ -125,27 +124,28 @@ def run(token, other_tokens, channel_names):
     else:
         print('Connection Failed, invalid token?')
 
-tokens = dict()
-other_tokens = dict()
-for channel in config.channels:
-    for token in channel["tokens"]:
-        if not token in tokens:
-            tokens[token] = list()
-        tokens[token].append(channel["name"])
+def init(config):
+    tokens = dict()
+    other_tokens = dict()
+    for channel in config["channels"]:
+        for token in channel["tokens"]:
+            if not token in tokens:
+                tokens[token] = list()
+            tokens[token].append(channel["name"])
 
-for token, channels in tokens.items():
-    other_tokens[token] = list()
-    for channel in channels:
-        for other_channel in config.channels:
-            if other_channel["name"]  == channel:
-                for other_token in other_channel["tokens"]:
-                    other_tokens[token].append(other_token)
+    for token, channels in tokens.items():
+        other_tokens[token] = list()
+        for channel in channels:
+            for other_channel in config["channels"]:
+                if other_channel["name"]  == channel:
+                    for other_token in other_channel["tokens"]:
+                        other_tokens[token].append(other_token)
 
 
-for token, channels in tokens.items():
-    shared_files[token] = list()
-    threads[token] = threading.Thread(target=run, args=(token,other_tokens[token],channels))
-    threads[token].start()
+    for token, channels in tokens.items():
+        shared_files[token] = list()
+        threads[token] = threading.Thread(target=run, args=(token,other_tokens[token],channels))
+        threads[token].start()
 
-for token in tokens:
-    threads[token].join()
+    for token in tokens:
+        threads[token].join()
