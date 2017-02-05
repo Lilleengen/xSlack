@@ -50,6 +50,8 @@ def run(token, other_tokens, channel_names):
         for group in sc.api_call("groups.list")["groups"]:
             channels[group["id"]] = group["name"]
         while True:
+            if token not in config:
+                break
             if channel_names != config[token]:
                 channel_names = config[token]
                 if (len(channel_names) == 0):
@@ -207,18 +209,15 @@ def run(token, other_tokens, channel_names):
     else:
         print('Connection Failed, invalid token?')
 
-
-def start():
-    for token, channels in config.items():
-        shared_files[token] = list()
-        threads[token] = threading.Thread(target=run, args=(token, get_other_tokens(token), channels))
-        threads[token].start()
-
-
 def add_token_channel(token, channel):
     if token not in config:
         config[token] = list()
     config[token].append(channel)
+
+    if token not in threads:
+        shared_files[token] = list()
+        threads[token] = threading.Thread(target=run, args=(token, get_other_tokens(token), config[token]))
+        threads[token].start()
 
 
 def remove_token_channel(token, channel):
@@ -226,6 +225,7 @@ def remove_token_channel(token, channel):
         config[token].remove(channel)
         if len(config[token]) == 0:
             config.pop(token)
+
 
 
 def get_other_tokens(token):

@@ -3,7 +3,7 @@
 import json
 import sys
 
-from .xslack import add_token_channel, start
+from .xslack import add_token_channel, remove_token_channel
 
 
 def main():
@@ -11,5 +11,3 @@ def main():
     for channel in config["channels"]:
         for token in channel["tokens"]:
             add_token_channel(token, channel["name"])
-
-    start()
