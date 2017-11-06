@@ -1,5 +1,5 @@
 # xSlack
-**Please note that due to Slacks integrated shared channels support, this software is not currently maintained**
+**Please note that due to Slacks integrated shared channels support, this software is not currently maintained.**
 
 # Old README
 Open source, self hosted cross-team channels for Slack!
